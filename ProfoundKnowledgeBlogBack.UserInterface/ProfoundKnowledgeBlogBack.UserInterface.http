@@ -1,0 +1,6 @@
+@ProfoundKnowledgeBlogBack.UserInterface_HostAddress = http://localhost:5058
+
+GET {{ProfoundKnowledgeBlogBack.UserInterface_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

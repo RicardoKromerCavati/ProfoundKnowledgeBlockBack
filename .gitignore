@@ -1,0 +1,119 @@
+# =========================
+# Build artifacts
+# =========================
+bin/
+obj/
+out/
+publish/
+*.appx
+*.appxbundle
+*.msix
+*.msixbundle
+
+# =========================
+# User-specific files
+# =========================
+*.user
+*.userosscache
+*.suo
+*.userprefs
+
+# =========================
+# Visual Studio / Rider / VS Code
+# =========================
+.vs/
+.idea/
+.vscode/
+
+# VS Code settings (optional: keep if shared)
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# =========================
+# Logs
+# =========================
+*.log
+logs/
+*.tlog
+
+# =========================
+# OS generated files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# NuGet
+# =========================
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Keep lock files if using PackageReference (recommended)
+!packages.lock.json
+
+# =========================
+# Test results
+# =========================
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# =========================
+# ASP.NET / Web
+# =========================
+wwwroot/lib/
+node_modules/
+
+# =========================
+# Secrets / environment
+# =========================
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# User secrets (local dev)
+**/secrets.json
+
+# =========================
+# Entity Framework
+# =========================
+*.db
+*.sqlite
+*.sqlite3
+
+# =========================
+# Publish profiles
+# =========================
+Properties/PublishProfiles/
+
+# =========================
+# Resharper / Rider
+# =========================
+_ReSharper*/
+*.DotSettings.user
+
+# =========================
+# Azure / deployment
+# =========================
+.azure/
+*.PublishSettings
+
+# =========================
+# Temporary files
+# =========================
+*.tmp
+*.temp
+*.cache
+
+# =========================
+# Generated files
+# =========================
+Generated/

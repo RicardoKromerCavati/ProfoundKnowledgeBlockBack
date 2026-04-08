@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="ProfoundKnowledgeBlogBack.Application/ProfoundKnowledgeBlogBack.Application.csproj" />
+  <Project Path="ProfoundKnowledgeBlogBack.Domain/ProfoundKnowledgeBlogBack.Domain.csproj" />
+  <Project Path="ProfoundKnowledgeBlogBack.Infrastructure/ProfoundKnowledgeBlogBack.Infrastructure.csproj" />
+  <Project Path="ProfoundKnowledgeBlogBack.UserInterface/ProfoundKnowledgeBlogBack.UserInterface.csproj" />
+</Solution>
