@@ -1,9 +1,10 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace ProfoundKnowledgeBlogBack.Application.Authentication.Login;
+namespace ProfoundKnowledgeBlogBack.Application.Session;
 
-public class UserLoginResponse
+public class UserSessionResponse
 {
+
     [JsonPropertyName("email")]
     public string Email { get; set; } = string.Empty;
 
