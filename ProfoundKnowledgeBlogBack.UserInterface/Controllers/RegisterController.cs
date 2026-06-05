@@ -20,9 +20,7 @@ public class RegisterController(IRegisterUserUseCase registerUserUseCase) : Cont
 
         return Ok(new UserRegisterResponse
         {
-            Email = userRegisterRequest.Email,
-            Username = userRegisterRequest.Email,
-            Token = Guid.NewGuid().ToString()
+            Message = "Registration successful! Redirecting to login page.."
         });
     }
 }
