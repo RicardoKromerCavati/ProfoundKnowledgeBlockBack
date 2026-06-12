@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProfoundKnowledgeBlogBack.Application.Authentication.Login;
 using ProfoundKnowledgeBlogBack.Application.Users.UseCases;
+using ProfoundKnowledgeBlogBack.UserInterface.Responses;
 
 namespace ProfoundKnowledgeBlogBack.UserInterface.Controllers;
 
@@ -9,15 +10,15 @@ namespace ProfoundKnowledgeBlogBack.UserInterface.Controllers;
 public class AuthenticationController(ILoginUserUseCase loginUserUseCase) : ControllerBase
 {
     [HttpPost]
-    public async ValueTask<ActionResult<UserLoginResponse>> Login([FromBody] UserLoginRequest userLoginRequest)
+    public async ValueTask<IResult> Login([FromBody] UserLoginRequest userLoginRequest)
     {
         var result = await loginUserUseCase.LogUserIn(userLoginRequest);
 
         if (!result.IsSuccessful)
         {
-            return BadRequest(result.ErrorMessage);
+            return ProblemResponse.Create(StatusCodes.Status400BadRequest, "Invalid email or password", result.ErrorMessage);
         }
 
-        return Ok(result.Value);
+        return Results.Ok(result.Value);
     }
 }
