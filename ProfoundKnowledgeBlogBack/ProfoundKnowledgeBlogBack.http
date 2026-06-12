@@ -1,6 +1,0 @@
-@ProfoundKnowledgeBlogBack_HostAddress = http://localhost:5012
-
-GET {{ProfoundKnowledgeBlogBack_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
