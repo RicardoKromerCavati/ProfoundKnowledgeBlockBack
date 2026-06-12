@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProfoundKnowledgeBlogBack.Application.Authentication.Login;
-using ProfoundKnowledgeBlogBack.Application.Session;
 using ProfoundKnowledgeBlogBack.Application.Users.UseCases;
 
 namespace ProfoundKnowledgeBlogBack.UserInterface.Controllers;
