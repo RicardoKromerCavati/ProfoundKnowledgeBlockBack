@@ -15,12 +15,12 @@ public class RegisterController(IRegisterUserUseCase registerUserUseCase) : Cont
 
         if (!isValid)
         {
-            return BadRequest(message);
+            return BadRequest(message ?? "Bad request");
         }
 
         return Ok(new UserRegisterResponse
         {
-            Message = "Registration successful! Redirecting to login page.."
+            Message = "Registration successful! Redirecting to login page..."
         });
     }
 }

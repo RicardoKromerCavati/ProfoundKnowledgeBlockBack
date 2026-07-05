@@ -6,7 +6,7 @@ using System.Security.Claims;
 
 namespace ProfoundKnowledgeBlogBack.Application.Users.UseCases;
 
-public class SessionValidationUseCase(IJwtService jwtService, IOptions<AppSettings> options) : ISessionValidationUseCase
+public class SessionValidationUseCase(IJwtService jwtService) : ISessionValidationUseCase
 {
     public async ValueTask<OperationResult<UserSessionResponse>> ValidateSession(string token)
     {
@@ -22,7 +22,7 @@ public class SessionValidationUseCase(IJwtService jwtService, IOptions<AppSettin
 
         try
         {
-            var claimsPrincipal = jwtService.ValidateToken(options.Value.Key, token);
+            var claimsPrincipal = jwtService.ValidateToken(token);
             email = claimsPrincipal.FindFirst(ClaimTypes.Email)?.Value!;
             username = claimsPrincipal.FindFirst(ClaimTypes.Name)?.Value!;
         }

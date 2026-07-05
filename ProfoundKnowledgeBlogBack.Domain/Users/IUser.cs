@@ -5,4 +5,5 @@ public interface IUser
     string Email { get; set; }
     string PasswordHash { get; set; }
     string Username { get; set; }
+    public Guid UserId { get; set; }
 }

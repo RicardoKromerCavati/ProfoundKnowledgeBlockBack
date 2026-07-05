@@ -1,12 +1,21 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using ProfoundKnowledgeBlogBack.Application.Password;
+using ProfoundKnowledgeBlogBack.Application.Posts.UseCases;
 using ProfoundKnowledgeBlogBack.Application.Users;
 using ProfoundKnowledgeBlogBack.Application.Users.UseCases;
 using ProfoundKnowledgeBlogBack.Domain.Password;
+using ProfoundKnowledgeBlogBack.Domain.Posts;
 using ProfoundKnowledgeBlogBack.Domain.Users;
 using ProfoundKnowledgeBlogBack.Infrastructure;
+using ProfoundKnowledgeBlogBack.Infrastructure.Posts;
 using ProfoundKnowledgeBlogBack.Infrastructure.Users;
+using Swashbuckle.AspNetCore.Filters;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +34,18 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+    });
+
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
+});
 
 builder.Services.AddDbContext<ProfoundKnowledgeContext>(options => options.UseInMemoryDatabase("ProfoundKnowledge"));
 builder.Services.AddTransient<IUserRepository, UserRepository>();
@@ -34,6 +54,8 @@ builder.Services.AddTransient<ILoginUserUseCase, LoginUserUseCase>();
 builder.Services.AddTransient<IPasswordService, PasswordService>();
 builder.Services.AddTransient<ISessionValidationUseCase, SessionValidationUseCase>();
 builder.Services.AddTransient<IJwtService, JwtService>();
+builder.Services.AddTransient<ICreatePostUseCase, CreatePostUseCase>();
+builder.Services.AddTransient<IPostRepository, PostRepository>();
 
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
@@ -43,18 +65,32 @@ builder.Services.AddProblemDetails(options =>
     {
         ctx.ProblemDetails.Instance = $"{ctx.HttpContext.Request.Method} {ctx.HttpContext.Request.Path}";
         ctx.ProblemDetails.Extensions.TryAdd("requestId", ctx.HttpContext.TraceIdentifier);
-        
+
         var activity = ctx.HttpContext.Features.Get<IHttpActivityFeature>()?.Activity;
         ctx.ProblemDetails.Extensions.TryAdd("traceId", activity?.Id);
     };
 });
 
+builder.Services
+  .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+  .AddJwtBearer(options =>
+  {
+      options.TokenValidationParameters = new TokenValidationParameters
+      {
+          ValidateIssuerSigningKey = true,
+          ValidateIssuer = true,
+          ValidateAudience = true,
+          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:Key").Value!)),
+          ValidAudience = builder.Configuration.GetSection("AppSettings:Audience").Value!,
+          ValidIssuer = builder.Configuration.GetSection("AppSettings:Issuer").Value!
+      };
+  });
+
 var app = builder.Build();
 
 app.UseCors("AllowAngularInDevelopment");
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsProduction() is false)
 {
     app.MapOpenApi();
     app.UseSwagger();
@@ -62,6 +98,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

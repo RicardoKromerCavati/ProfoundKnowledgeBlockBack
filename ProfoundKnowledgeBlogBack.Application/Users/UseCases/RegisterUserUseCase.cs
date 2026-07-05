@@ -1,8 +1,6 @@
 ﻿using ProfoundKnowledgeBlogBack.Application.Register;
 using ProfoundKnowledgeBlogBack.Domain.Password;
 using ProfoundKnowledgeBlogBack.Domain.Users;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace ProfoundKnowledgeBlogBack.Application.Users.UseCases;
 
@@ -17,6 +15,13 @@ public class RegisterUserUseCase(IUserRepository userRepository, IPasswordServic
             if (!isValid)
             {
                 return (false, message);
+            }
+
+            var isStrongEnough = passwordService.IsStrong(userRegisterRequest.Password);
+
+            if (!isStrongEnough)
+            {
+                return (false, string.Empty);
             }
 
             var password = passwordService.Create(userRegisterRequest.Password);

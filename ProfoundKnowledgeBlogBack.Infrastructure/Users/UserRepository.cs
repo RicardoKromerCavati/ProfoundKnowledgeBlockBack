@@ -17,6 +17,9 @@ public class UserRepository(ProfoundKnowledgeContext profoundKnowledgeContext) :
         return await profoundKnowledgeContext.Users.CountAsync(u => u.Username.Equals(username));
     }
 
+    public async ValueTask<int> SelectCountByUserId(Guid userId) =>
+        await profoundKnowledgeContext.Users.CountAsync(u => u.UserId.Equals(userId));
+
     public async ValueTask InsertUser(IUser user)
     {
         var dbUser = DbUser.Create(user);

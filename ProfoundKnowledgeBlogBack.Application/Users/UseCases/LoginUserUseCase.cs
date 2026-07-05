@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using ProfoundKnowledgeBlogBack.Application.Authentication.Login;
+﻿using ProfoundKnowledgeBlogBack.Application.Authentication.Login;
 using ProfoundKnowledgeBlogBack.Domain.Password;
 using ProfoundKnowledgeBlogBack.Domain.Shared;
 using ProfoundKnowledgeBlogBack.Domain.Users;
@@ -9,8 +8,7 @@ namespace ProfoundKnowledgeBlogBack.Application.Users.UseCases;
 public class LoginUserUseCase(
     IUserRepository userRepository,
     IPasswordService passwordService,
-    IJwtService jwtService,
-    IOptions<AppSettings> options) : ILoginUserUseCase
+    IJwtService jwtService) : ILoginUserUseCase
 {
     public async ValueTask<OperationResult<UserLoginResponse>> LogUserIn(UserLoginRequest userLoginRequest)
     {
@@ -36,7 +34,7 @@ public class LoginUserUseCase(
             return OperationResult<UserLoginResponse>.Error("Invalid email or password");
         }
 
-        var token = jwtService.CreateToken(options.Value.Key, userLoginRequest.Email, user.Username);
+        var token = jwtService.CreateToken(userLoginRequest.Email, user.Username, user.UserId);
 
         return OperationResult<UserLoginResponse>.Success(new UserLoginResponse { Email = user.Email, Token = token, Username = user.Username });
     }
