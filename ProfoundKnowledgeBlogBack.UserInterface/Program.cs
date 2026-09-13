@@ -65,7 +65,9 @@ builder.Services.AddSwaggerGen(options =>
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
-builder.Services.AddDbContext<ProfoundKnowledgeContext>(options => options.UseInMemoryDatabase("ProfoundKnowledge"));
+var connectionString = "";
+builder.Services.AddDbContext<ProfoundKnowledgeContext>(options => options.UseMySql(connectionString, MySqlServerVersion.AutoDetect(connectionString)));
+
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<IRegisterUserUseCase, RegisterUserUseCase>();
 builder.Services.AddTransient<ILoginUserUseCase, LoginUserUseCase>();
@@ -109,24 +111,6 @@ builder.Services
   });
 
 var app = builder.Build();
-
-using var s = app.Services.CreateScope();
-
-var provider = s.ServiceProvider;
-
-var c = provider.GetRequiredService<ProfoundKnowledgeContext>();
-
-var user = new User()
-{
-    Email = "ricardo@gmail.com",
-    UserId = Guid.NewGuid(),
-    Username = "ricardo",
-    PasswordHash = "a"
-};
-
-c.Users.Add(user);
-
-c.SaveChanges();
 
 app.UseCors("AllowAngularInDevelopment");
 
