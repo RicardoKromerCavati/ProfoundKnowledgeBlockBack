@@ -2,12 +2,12 @@
 
 namespace ProfoundKnowledgeBlogBack.Infrastructure.Users;
 
-public class DbUser : IUser
+public class DbUser
 {
     public Guid UserId { get; set; }
-    public string Email { get; set; }
-    public string PasswordHash { get; set; }
-    public string Username { get; set; }
+    public string Email { get; set; } = string.Empty;
+    public string PasswordHash { get; set; } = string.Empty;
+    public string Username { get; set; } = string.Empty;
 
     public DbUser(Guid id, string email, string passwordHash, string username)
     {
@@ -22,5 +22,5 @@ public class DbUser : IUser
         
     }
 
-    public static DbUser Create(IUser user) => new(Guid.NewGuid(), user.Email, user.PasswordHash, user.Username);
+    public static DbUser Create(User user) => new(Guid.NewGuid(), user.Email, user.PasswordHash, user.Username);
 }

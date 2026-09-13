@@ -8,43 +8,45 @@ namespace ProfoundKnowledgeBlogBack.Application.Posts.UseCases;
 public class CreatePostUseCase(
     IPostRepository postRepository,
     IUserRepository userRepository,
+    IHtmlCleaner htmlCleaner,
+    IQuillDeltaCleaner quillDeltaCleaner,
+    IImageProcessor imageProcessor,
     ILogger<CreatePostUseCase> logger) : ICreatePostUseCase
 {
     public async ValueTask<OperationResult> CreatePost(Guid userIdentifier, CreatePostsRequest createPostRequest)
     {
-        var count = await userRepository.SelectCountByUserId(userIdentifier);
-
-        if (count <= 0)
+        try
         {
-            logger.LogError("User {UserId} not found, post not saved", userIdentifier);
-            return OperationResult.Error("Could not save new post");
+            var count = await userRepository.SelectCountByUserId(userIdentifier);
+
+            if (count <= 0)
+            {
+                logger.LogError("User {UserId} not found, post not saved", userIdentifier);
+                return OperationResult.Error("Could not save new post");
+            }
+
+            var cleanTitle = htmlCleaner.Sanitize(createPostRequest.Title);
+
+            var cleanContent = quillDeltaCleaner.Sanitize(createPostRequest.Content);
+
+            var cleanImageInBytes = await imageProcessor.SanitizeBase64(createPostRequest.ImageBase64);
+
+            var relativePath = await imageProcessor.Save("posts", cleanImageInBytes);
+
+            var post =
+                new Post(
+                    userIdentifier,
+                    cleanTitle,
+                    cleanContent,
+                    relativePath);
+
+            await postRepository.Insert(post);
+
+            return OperationResult.Success();
         }
-
-        if (string.IsNullOrWhiteSpace(createPostRequest.Title))
+        catch (Exception e)
         {
-            return OperationResult.Error("The post must have a title");
+            return OperationResult.Error(e.Message);
         }
-
-        if (string.IsNullOrWhiteSpace(createPostRequest.Title))
-        {
-            return OperationResult.Error("The post must have content");
-        }
-
-        if (string.IsNullOrWhiteSpace(createPostRequest.Title))
-        {
-            return OperationResult.Error("The post must have an image");
-        }
-
-        var businessPost = new BusinessPost()
-        {
-            Content = createPostRequest.Content,
-            ImageBase64 = createPostRequest.ImageBase64,
-            Title = createPostRequest.Title,
-            UserId = userIdentifier
-        };
-
-        await postRepository.Insert(businessPost);
-
-        return OperationResult.Success();
     }
 }

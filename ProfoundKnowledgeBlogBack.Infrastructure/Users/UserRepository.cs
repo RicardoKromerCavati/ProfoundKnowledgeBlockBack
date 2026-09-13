@@ -20,14 +20,13 @@ public class UserRepository(ProfoundKnowledgeContext profoundKnowledgeContext) :
     public async ValueTask<int> SelectCountByUserId(Guid userId) =>
         await profoundKnowledgeContext.Users.CountAsync(u => u.UserId.Equals(userId));
 
-    public async ValueTask InsertUser(IUser user)
+    public async ValueTask InsertUser(User user)
     {
-        var dbUser = DbUser.Create(user);
-        await profoundKnowledgeContext.Users.AddAsync(dbUser);
+        await profoundKnowledgeContext.Users.AddAsync(user);
         await profoundKnowledgeContext.SaveChangesAsync();
     }
 
-    public async ValueTask<IUser?> SelectDbUserByEmail(string email)
+    public async ValueTask<User?> SelectDbUserByEmail(string email)
     {
         email = email.ToLower();
         return await profoundKnowledgeContext.Users.Where(u => u.Email.Equals(email)).FirstOrDefaultAsync();

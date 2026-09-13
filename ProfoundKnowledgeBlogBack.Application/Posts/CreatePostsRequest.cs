@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 namespace ProfoundKnowledgeBlogBack.Application.Posts;
 
@@ -8,7 +9,7 @@ public class CreatePostsRequest
     public string Title { get; set; } = string.Empty;
 
     [JsonPropertyName("content")]
-    public string Content { get; set; } = string.Empty;
+    public JsonNode Content { get; set; } = string.Empty;
 
     [JsonPropertyName("imageBase64")]
     public string ImageBase64 { get; set; } = string.Empty;

@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ProfoundKnowledgeBlogBack.Application.Interfaces;
 using ProfoundKnowledgeBlogBack.Application.Posts;
 using ProfoundKnowledgeBlogBack.Application.Posts.UseCases;
 using ProfoundKnowledgeBlogBack.UserInterface.Extensions;
+using ProfoundKnowledgeBlogBack.UserInterface.Responses;
 
 namespace ProfoundKnowledgeBlogBack.UserInterface.Controllers;
 
@@ -10,6 +12,7 @@ namespace ProfoundKnowledgeBlogBack.UserInterface.Controllers;
 [Route("[controller]")]
 public class PostsController(
     ICreatePostUseCase createUserUseCase,
+    IPostQueries postQueries,
     ILogger<PostsController> logger) : ControllerBase
 {
     [HttpPost("create")]
@@ -23,7 +26,7 @@ public class PostsController(
 
             if (!result.IsSuccessful)
             {
-                return Results.BadRequest(result.ErrorMessage);
+                return ProblemResponse.Create(StatusCodes.Status400BadRequest, result.ErrorMessage, result.ErrorMessage);
             }
 
             return Results.Ok();
@@ -31,7 +34,23 @@ public class PostsController(
         catch (Exception e)
         {
             logger.LogError(e, "Could not save post");
-            return Results.BadRequest("");
+            return Results.BadRequest(string.Empty);
+        }
+    }
+
+    [HttpGet()]
+    public async ValueTask<IResult> GetAllPosts()
+    {
+        try
+        {
+            var posts = await postQueries.GetAllWithAuthorAsync();
+
+            return Results.Ok(posts);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Could not obtain posts");
+            return Results.BadRequest(string.Empty);
         }
     }
 }

@@ -26,7 +26,7 @@ public class RegisterUserUseCase(IUserRepository userRepository, IPasswordServic
 
             var password = passwordService.Create(userRegisterRequest.Password);
 
-            var user = new BusinessUser
+            var user = new User
             {
                 Email = userRegisterRequest.Email,
                 PasswordHash = password,

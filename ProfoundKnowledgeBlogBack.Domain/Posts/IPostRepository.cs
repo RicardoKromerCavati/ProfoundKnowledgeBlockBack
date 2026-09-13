@@ -2,5 +2,5 @@
 
 public interface IPostRepository
 {
-    ValueTask Insert(IPost post);
+    ValueTask Insert(Post post);
 }

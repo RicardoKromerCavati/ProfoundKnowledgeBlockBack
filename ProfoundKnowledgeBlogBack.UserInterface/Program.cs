@@ -1,27 +1,45 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using NetVips;
+using ProfoundKnowledgeBlogBack.Application.Interfaces;
 using ProfoundKnowledgeBlogBack.Application.Password;
 using ProfoundKnowledgeBlogBack.Application.Posts.UseCases;
 using ProfoundKnowledgeBlogBack.Application.Users;
 using ProfoundKnowledgeBlogBack.Application.Users.UseCases;
 using ProfoundKnowledgeBlogBack.Domain.Password;
 using ProfoundKnowledgeBlogBack.Domain.Posts;
+using ProfoundKnowledgeBlogBack.Domain.Shared;
 using ProfoundKnowledgeBlogBack.Domain.Users;
 using ProfoundKnowledgeBlogBack.Infrastructure;
 using ProfoundKnowledgeBlogBack.Infrastructure.Posts;
+using ProfoundKnowledgeBlogBack.Infrastructure.Queries;
+using ProfoundKnowledgeBlogBack.Infrastructure.Shared;
 using ProfoundKnowledgeBlogBack.Infrastructure.Users;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
+using System.Text.Json;
+
+Environment.SetEnvironmentVariable("VIPS_BLOCK_UNTRUSTED", "1");
+
+Operation.Block("VipsForeignLoad", true);
+
+Operation.Block("VipsForeignLoadJpeg", false);
+Operation.Block("VipsForeignLoadPng", false);
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services
+.AddControllers()
+.AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    });
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -56,6 +74,10 @@ builder.Services.AddTransient<ISessionValidationUseCase, SessionValidationUseCas
 builder.Services.AddTransient<IJwtService, JwtService>();
 builder.Services.AddTransient<ICreatePostUseCase, CreatePostUseCase>();
 builder.Services.AddTransient<IPostRepository, PostRepository>();
+builder.Services.AddSingleton<IHtmlCleaner, HtmlCleaner>();
+builder.Services.AddSingleton<IQuillDeltaCleaner, QuillDeltaCleaner>();
+builder.Services.AddSingleton<IImageProcessor, ImageProcessor>();
+builder.Services.AddTransient<IPostQueries, PostQueries>();
 
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
@@ -87,6 +109,24 @@ builder.Services
   });
 
 var app = builder.Build();
+
+using var s = app.Services.CreateScope();
+
+var provider = s.ServiceProvider;
+
+var c = provider.GetRequiredService<ProfoundKnowledgeContext>();
+
+var user = new User()
+{
+    Email = "ricardo@gmail.com",
+    UserId = Guid.NewGuid(),
+    Username = "ricardo",
+    PasswordHash = "a"
+};
+
+c.Users.Add(user);
+
+c.SaveChanges();
 
 app.UseCors("AllowAngularInDevelopment");
 

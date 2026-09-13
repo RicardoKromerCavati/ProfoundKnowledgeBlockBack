@@ -2,9 +2,9 @@
 
 public interface IUserRepository
 {
-    ValueTask InsertUser(IUser user);
+    ValueTask InsertUser(User user);
     ValueTask<int> SelectCountByEmail(string email);
     ValueTask<int> SelectCountByUserId(Guid userId);
     ValueTask<int> SelectCountByUsername(string username);
-    ValueTask<IUser?> SelectDbUserByEmail(string email);
+    ValueTask<User?> SelectDbUserByEmail(string email);
 }

@@ -4,10 +4,9 @@ namespace ProfoundKnowledgeBlogBack.Infrastructure.Posts;
 
 public class PostRepository(ProfoundKnowledgeContext profoundKnowledgeContext) : IPostRepository
 {
-    public async ValueTask Insert(IPost post)
+    public async ValueTask Insert(Post post)
     {
-        var dbPost = DbPost.Create(post);
-        profoundKnowledgeContext.Posts.Add(dbPost);
+        profoundKnowledgeContext.Posts.Add(post);
         await profoundKnowledgeContext.SaveChangesAsync();
     }
 }
