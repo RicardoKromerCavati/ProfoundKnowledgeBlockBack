@@ -117,3 +117,6 @@ _ReSharper*/
 # Generated files
 # =========================
 Generated/
+
+/wwwroot/
+*/wwwroot/*
