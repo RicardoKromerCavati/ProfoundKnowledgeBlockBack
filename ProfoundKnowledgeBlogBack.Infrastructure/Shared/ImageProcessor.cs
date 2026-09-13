@@ -7,35 +7,43 @@ namespace ProfoundKnowledgeBlogBack.Infrastructure.Shared;
 public class ImageProcessor : IImageProcessor
 {
     private const string WwwRoot = "wwwroot";
-    private const int MaxFileSize = 1 * 1024 * 1024; // 1 MB
-    private const int MaxWidth = 4096;
-    private const int MaxHeight = 4096;
-    const long maxPixels = 16_000_000;
+
+    public async ValueTask<string> Save(string directory, byte[] cleanImageInBytes)
+    {
+        var fileName = $"{Guid.NewGuid()}.jpg";
+
+        var storagePath = Path.Combine(Directory.GetCurrentDirectory(), WwwRoot, directory);
+
+        var fullPath = Path.Combine(storagePath, fileName);
+
+        if (!Directory.Exists(storagePath))
+        {
+            Directory.CreateDirectory(storagePath);
+        }
+
+        await File.WriteAllBytesAsync(fullPath, cleanImageInBytes);
+
+        var relativePath = $"/{directory}/{fileName}";
+
+        return relativePath;
+    }
 
     public async ValueTask<byte[]> SanitizeBase64(string base64)
     {
-        const int MaxFileSize = 5 * 1024 * 1024;
+        const int MaxFileSize = 5 * 1024 * 1024; // 5MB
 
         byte[] bytes;
 
         try
         {
             if (string.IsNullOrWhiteSpace(base64))
-                throw new ArgumentException("Image cannot be empty.");
-
-            var commaIndex = base64.IndexOf(',');
-
-            if (base64.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
             {
-                if (commaIndex < 0)
-                    throw new ArgumentException("Invalid image Data URI.");
-
-                base64 = base64[(commaIndex + 1)..];
+                throw new ArgumentException("Image cannot be empty.");
             }
 
-            bytes = Convert.FromBase64String(base64);
+            base64 = RemoveDataUrlPrefix(base64);
 
-            Console.WriteLine(Convert.ToHexString(bytes.Take(16).ToArray()));
+            bytes = Convert.FromBase64String(base64);
         }
         catch (FormatException)
         {
@@ -43,16 +51,17 @@ public class ImageProcessor : IImageProcessor
         }
 
         if (bytes.Length == 0 || bytes.Length > MaxFileSize)
+        {
             throw new ArgumentException("Invalid image size.");
+        }
 
         Image? image = null;
 
         try
         {
-            image = Image.NewFromBuffer(
-            bytes,
-            access: Enums.Access.Sequential,
-            failOn: Enums.FailOn.Error);
+            image = Image.NewFromBuffer(bytes,
+                                        access: Enums.Access.Sequential,
+                                        failOn: Enums.FailOn.Error);
         }
         catch (VipsException)
         {
@@ -62,14 +71,9 @@ public class ImageProcessor : IImageProcessor
         }
 
         if (image.Width <= 0 || image.Height <= 0)
+        {
             throw new ArgumentException("Invalid image dimensions.");
-
-        //if (image.Width > MaxWidth ||
-        //    image.Height > MaxHeight)
-        //    throw new ArgumentException("Image dimensions are too large.");
-
-        //if ((long)image.Width * image.Height > MaxPixels)
-        //    throw new ArgumentException("Image contains too many pixels.");
+        }
 
         var loader = image.Get("vips-loader")?.ToString();
 
@@ -98,51 +102,19 @@ public class ImageProcessor : IImageProcessor
             ".jpg[Q=90,strip]");
     }
 
-    private static string RemoveDataUriPrefix(string dirtyBase64Image)
+    private static string RemoveDataUrlPrefix(string base64)
     {
-        if (dirtyBase64Image.Contains(','))
+        var commaIndex = base64.IndexOf(',');
+
+        if (base64.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
         {
-            var parts = dirtyBase64Image.Split(',');
-            dirtyBase64Image = parts[1];
+            if (commaIndex < 0)
+                throw new ArgumentException("Invalid image Data URI.");
+
+            base64 = base64[(commaIndex + 1)..];
         }
 
-        return dirtyBase64Image;
-    }
-
-    private static bool IsAllowedFormat(string? loader)
-    {
-        if (string.IsNullOrWhiteSpace(loader))
-            return false;
-
-        System.Console.WriteLine("loader", loader);
-
-        return loader.Equals(
-                   "jpegload",
-                   StringComparison.OrdinalIgnoreCase)
-               ||
-               loader.Equals(
-                   "pngload",
-                   StringComparison.OrdinalIgnoreCase);
-    }
-
-    public async ValueTask<string> Save(string directory, byte[] cleanImageInBytes)
-    {
-        var fileName = $"{Guid.NewGuid()}.jpg";
-
-        var storagePath = Path.Combine(Directory.GetCurrentDirectory(), WwwRoot, directory);
-
-        var fullPath = Path.Combine(storagePath, fileName);
-
-        if (!Directory.Exists(storagePath))
-        {
-            Directory.CreateDirectory(storagePath);
-        }
-
-        await File.WriteAllBytesAsync(fullPath, cleanImageInBytes);
-
-        var relativePath = $"/{directory}/{fileName}";
-
-        return relativePath;
+        return base64;
     }
 
     private static string DetectFormat(byte[] bytes)
