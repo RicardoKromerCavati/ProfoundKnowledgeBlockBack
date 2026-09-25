@@ -17,4 +17,9 @@
     <ProjectReference Include="..\ProfoundKnowledgeBlogBack.Domain\ProfoundKnowledgeBlogBack.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Authentication\Login\" />
+    <Folder Include="Users\UseCases\" />
+  </ItemGroup>
+
 </Project>

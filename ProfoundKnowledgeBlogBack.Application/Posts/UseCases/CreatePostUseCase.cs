@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using ProfoundKnowledgeBlogBack.Application.Interfaces.Services;
 using ProfoundKnowledgeBlogBack.Domain.Posts;
 using ProfoundKnowledgeBlogBack.Domain.Shared;
 using ProfoundKnowledgeBlogBack.Domain.Users;
@@ -10,7 +11,8 @@ public class CreatePostUseCase(
     IUserRepository userRepository,
     IHtmlCleaner htmlCleaner,
     IQuillDeltaCleaner quillDeltaCleaner,
-    IImageProcessor imageProcessor,
+    IImageSanitizer imageSanitizer,
+    IImageStoreService imageStoreService,
     ILogger<CreatePostUseCase> logger) : ICreatePostUseCase
 {
     public async ValueTask<OperationResult> CreatePost(Guid userIdentifier, CreatePostsRequest createPostRequest)
@@ -29,9 +31,9 @@ public class CreatePostUseCase(
 
             var cleanContent = quillDeltaCleaner.Sanitize(createPostRequest.Content);
 
-            var cleanImageInBytes = await imageProcessor.SanitizeBase64(createPostRequest.ImageBase64);
+            var cleanImageInBytes = await imageSanitizer.SanitizeBase64(createPostRequest.ImageBase64);
 
-            var relativePath = await imageProcessor.Save("posts", cleanImageInBytes);
+            var relativePath = await imageStoreService.Save("posts", cleanImageInBytes);
 
             var post =
                 new Post(

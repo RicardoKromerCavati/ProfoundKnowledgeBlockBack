@@ -1,5 +1,4 @@
-﻿using ProfoundKnowledgeBlogBack.Application.Authentication.Login;
-using ProfoundKnowledgeBlogBack.Domain.Shared;
+﻿using ProfoundKnowledgeBlogBack.Domain.Shared;
 
 namespace ProfoundKnowledgeBlogBack.Application.Posts.UseCases;
 

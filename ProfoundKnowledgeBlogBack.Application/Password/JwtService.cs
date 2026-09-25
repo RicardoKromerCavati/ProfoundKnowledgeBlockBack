@@ -8,7 +8,7 @@ using System.Text;
 
 namespace ProfoundKnowledgeBlogBack.Application.Password;
 
-public class JwtService(IOptions<AppSettings> options) : IJwtService
+public class JwtService(IOptions<TokenInformation> options) : IJwtService
 {
     public string CreateToken(string email, string username, Guid userIdentifier)
     {

@@ -4,7 +4,7 @@ using ProfoundKnowledgeBlogBack.Application.Interfaces;
 using ProfoundKnowledgeBlogBack.Application.Posts;
 using ProfoundKnowledgeBlogBack.Application.Posts.UseCases;
 using ProfoundKnowledgeBlogBack.UserInterface.Extensions;
-using ProfoundKnowledgeBlogBack.UserInterface.Responses;
+using ProfoundKnowledgeBlogBack.UserInterface.Responses.Default;
 
 namespace ProfoundKnowledgeBlogBack.UserInterface.Controllers;
 

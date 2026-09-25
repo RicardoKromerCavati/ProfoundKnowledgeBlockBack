@@ -1,6 +1,14 @@
 <Solution>
-  <Project Path="ProfoundKnowledgeBlogBack.Application/ProfoundKnowledgeBlogBack.Application.csproj" />
-  <Project Path="ProfoundKnowledgeBlogBack.Domain/ProfoundKnowledgeBlogBack.Domain.csproj" />
-  <Project Path="ProfoundKnowledgeBlogBack.Infrastructure/ProfoundKnowledgeBlogBack.Infrastructure.csproj" />
-  <Project Path="ProfoundKnowledgeBlogBack.UserInterface/ProfoundKnowledgeBlogBack.UserInterface.csproj" />
+  <Folder Name="/01 Presentation/">
+    <Project Path="ProfoundKnowledgeBlogBack.UserInterface/ProfoundKnowledgeBlogBack.UserInterface.csproj" />
+  </Folder>
+  <Folder Name="/02 Application/">
+    <Project Path="ProfoundKnowledgeBlogBack.Application/ProfoundKnowledgeBlogBack.Application.csproj" />
+  </Folder>
+  <Folder Name="/03 Infrastructure/">
+    <Project Path="ProfoundKnowledgeBlogBack.Infrastructure/ProfoundKnowledgeBlogBack.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/04 Domain/">
+    <Project Path="ProfoundKnowledgeBlogBack.Domain/ProfoundKnowledgeBlogBack.Domain.csproj" />
+  </Folder>
 </Solution>
